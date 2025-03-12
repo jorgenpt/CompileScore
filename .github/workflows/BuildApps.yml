@@ -65,39 +65,39 @@ jobs:
 
     - name: Upload Extractor Artifact 1
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
         path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.exe
 
     - name: Upload Extractor Artifact 2
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
         path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.dll
 
     - name: Upload Parser Artifact
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-Parser-${{env.toolsBuildConfig}}
         path: ${{env.parserDir}}/bin/x64/${{env.toolsBuildConfig}}/CompileScoreParser.exe
 
     - name: Upload VSIX 2019 Extension Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-VSIX2019-${{matrix.buildconfig}}
         path: ${{env.appsDir}}/VSIX16/bin/${{matrix.buildconfig}}/CompileScore.vsix
 
     - name: Upload VSIX 2022 Extension Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-VSIX2022-${{matrix.buildconfig}}
         path: ${{env.appsDir}}/VSIX17/bin/${{matrix.buildconfig}}/CompileScore.vsix
 
     - name: Upload App Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CompileScore-App-${{matrix.buildconfig}}
         path: ${{env.appsDir}}/WPF/bin/${{matrix.buildconfig}}/${{ env.NetPlatform }}/*
