@@ -1,7 +1,12 @@
 name: Build Apps
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      run_id:
+        description: "Run ID"
+        value: ${{ github.run_id }}
   push:
     branches: [ master ]
   pull_request:

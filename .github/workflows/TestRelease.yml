@@ -1,0 +1,46 @@
+name: Release (Test)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_apps:
+    uses: ./.github/workflows/BuildApps.yml
+
+  export:
+    needs: build_apps
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: Artifacts
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        run-id: ${{ needs.build_apps.outputs.run_id }}
+
+    - name: List
+      run: find Artifacts -ls
+    - name: Generate Extractor Asset
+      working-directory: Artifacts
+      run: |
+        mkdir Extractor-Windows-Archive
+        cp CompileScore-Extractor-Windows-Executable/ScoreDataExtractor.exe Extractor-Windows-Archive/
+        cp CompileScore-Extractor-Windows-Libraries/CppBuildInsights.dll CompileScore-Extractor-Windows-Libraries/KernelTraceControl.dll Extractor-Windows-Archive/
+        cd Extractor-Windows-Archive && zip ../CompileScoreExtractor.zip *
+
+    - name: Generate App Asset
+      working-directory: Artifacts/CompileScore-App-Release
+      run: |
+        zip ../CompileScoreApp.zip CompileScore.{dll,exe,runtimeconfig.json}
+
+    - name: Upload App Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CompileScoreExtractor.zip
+        path: Artifacts/CompileScoreExtractor.zip
+
+    - name: Upload App Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CompileScoreApp.zip
+        path: Artifacts/CompileScoreApp.zip
