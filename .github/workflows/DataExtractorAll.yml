@@ -75,11 +75,11 @@ jobs:
     - name: Upload Artifacts (Executable)
       uses: actions/upload-artifact@v4
       with:
-        name: CompileScore-Extractor-Windows
+        name: CompileScore-Extractor-Windows-Executable
         path: ${{env.baseDir}}/bin/x64/Release/*.exe
 
     - name: Upload Artifacts (Libraries)
       uses: actions/upload-artifact@v4
       with:
-        name: CompileScore-Extractor-Windows
+        name: CompileScore-Extractor-Windows-Libraries
         path: ${{env.baseDir}}/bin/x64/Release/*.dll
