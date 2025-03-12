@@ -8,7 +8,45 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build_linux:
+    runs-on: ubuntu-20.04
+
+    env:
+      extractorDir: ./DataExtractor
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: make
+      working-directory: ${{env.extractorDir}}
+      run: make
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CompileScore-Extractor-Linux
+        path: ${{env.extractorDir}}/bin/make/ScoreDataExtractor
+
+  build_macos:
+    runs-on: macos-latest
+
+    env:
+      extractorDir: ./DataExtractor
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: make
+      working-directory: ${{env.extractorDir}}
+      run: make
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CompileScore-Extractor-MacOS
+        path: ${{env.extractorDir}}/bin/make/ScoreDataExtractor
+
+  build_windows:
     runs-on: windows-latest
 
     env:
@@ -49,7 +87,7 @@ jobs:
 
     - name: Build Score Data Extractor
       working-directory: ${{env.extractorDir}}
-      run: msbuild /m /p:Configuration=${{ env.toolsBuildConfig }} /p:Platform=x64 ${{ env.extractorSolution }}
+      run: msbuild /m /p:Configuration=${{ matrix.buildconfig }} /p:Platform=x64 ${{ env.extractorSolution }}
 
     - name: Build Parser
       working-directory: ${{env.parserDir}}
@@ -63,19 +101,19 @@ jobs:
       working-directory: ${{env.appsDir}}
       run: msbuild /m /p:Configuration=${{matrix.buildconfig}} ${{ env.appsSolutionName }}
 
-    - name: Upload Extractor Artifact 1
+    - name: Upload Extractor Artifacts (Executable)
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
       uses: actions/upload-artifact@v4
       with:
-        name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
-        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.exe
+        name: CompileScore-Extractor-Windows-Executable
+        path: ${{env.extractorDir}}/bin/x64/${{matrix.buildconfig}}/*.exe
 
-    - name: Upload Extractor Artifact 2
+    - name: Upload Extractor Artifacts (Libraries)
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
       uses: actions/upload-artifact@v4
       with:
-        name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
-        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.dll
+        name: CompileScore-Extractor-Windows-Libraries
+        path: ${{env.extractorDir}}/bin/x64/${{matrix.buildconfig}}/*.dll
 
     - name: Upload Parser Artifact
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
