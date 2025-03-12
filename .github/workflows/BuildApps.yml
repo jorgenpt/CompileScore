@@ -1,6 +1,7 @@
 name: Build Apps
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [ master ]
   pull_request:
@@ -9,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    
+
     env:
       extractorDir: ./DataExtractor
       parserDir: ./Parser
@@ -19,11 +20,11 @@ jobs:
       appsSolution: CompileScore.sln
       toolsBuildConfig: Release
       NetPlatform: net7.0-windows
-    
+
     strategy:
       matrix:
         buildconfig: [Release]
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -37,64 +38,64 @@ jobs:
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1
-     
+
     - uses: nuget/setup-nuget@v1
       with:
         nuget-version: '5.x'
-       
+
     - name: NuGet restore Score Data Extractor
       working-directory: ${{env.extractorDir}}
       run: nuget restore ${{ env.extractorSolution }}
-       
+
     - name: Build Score Data Extractor
       working-directory: ${{env.extractorDir}}
       run: msbuild /m /p:Configuration=${{ env.toolsBuildConfig }} /p:Platform=x64 ${{ env.extractorSolution }}
-        
+
     - name: Build Parser
       working-directory: ${{env.parserDir}}
       run: msbuild /m /p:Configuration=${{ env.toolsBuildConfig }} /p:Platform=x64 ${{ env.parserSolution }}
-        
+
     - name: NuGet restore Compile Score
       working-directory: ${{env.appsDir}}
       run: nuget restore ${{ env.appsSolutionName }}
-     
+
     - name: Build Compile Score VSIX
       working-directory: ${{env.appsDir}}
       run: msbuild /m /p:Configuration=${{matrix.buildconfig}} ${{ env.appsSolutionName }}
-      
+
     - name: Upload Extractor Artifact 1
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
       uses: actions/upload-artifact@v3
       with:
         name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
-        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.exe  
-        
+        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.exe
+
     - name: Upload Extractor Artifact 2
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
       uses: actions/upload-artifact@v3
       with:
         name: CompileScore-Extractor-${{ env.toolsBuildConfig }}
-        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.dll  
-    
+        path: ${{env.extractorDir}}/bin/x64/${{ env.toolsBuildConfig }}/*.dll
+
     - name: Upload Parser Artifact
       if: ${{matrix.buildconfig == env.toolsBuildConfig}}
       uses: actions/upload-artifact@v3
       with:
         name: CompileScore-Parser-${{env.toolsBuildConfig}}
-        path: ${{env.parserDir}}/bin/x64/${{env.toolsBuildConfig}}/CompileScoreParser.exe  
+        path: ${{env.parserDir}}/bin/x64/${{env.toolsBuildConfig}}/CompileScoreParser.exe
 
     - name: Upload VSIX 2019 Extension Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: CompileScore-VSIX2019-${{matrix.buildconfig}}
         path: ${{env.appsDir}}/VSIX16/bin/${{matrix.buildconfig}}/CompileScore.vsix
-    
+
     - name: Upload VSIX 2022 Extension Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: CompileScore-VSIX2022-${{matrix.buildconfig}}
         path: ${{env.appsDir}}/VSIX17/bin/${{matrix.buildconfig}}/CompileScore.vsix
-    
+
     - name: Upload App Artifacts
       uses: actions/upload-artifact@v3
       with:
